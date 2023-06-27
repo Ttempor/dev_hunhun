@@ -43,6 +43,11 @@ public class CategoryController {
         return BaseResponse.ok(courseService.getCategory());
     }
 
+    /**
+     *
+     * @param gradeId
+     * @return
+     */
     @GetMapping("/grade")
     public BaseResponse<AppGradeVO> getCategoryGrade(@RequestParam Long gradeId) {
         AppGradeVO categoryGrade = gradeService.getCategoryGrade(gradeId);
