@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.base.GradeMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.base.Grade">
+            <id property="gradeId" column="grade_id" jdbcType="INTEGER"/>
+            <result property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="INTEGER"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="teacherId" column="teacher_id" jdbcType="INTEGER"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="gradeNowStudentCount" column="grade_now_student_count" jdbcType="INTEGER"/>
+            <result property="gradeMaxStudentCount" column="grade_max_student_count" jdbcType="INTEGER"/>
+            <result property="gradeNowPeriod" column="grade_now_period" jdbcType="INTEGER"/>
+            <result property="gradeTotalPeriod" column="grade_total_period" jdbcType="INTEGER"/>
+
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="BIGINT"/>
+            <result property="chargeMethodName" column="charge_method_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="DECIMAL"/>
+            <result property="income" column="income" jdbcType="DECIMAL"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+
+            <result property="gradeState" column="grade_state" jdbcType="TINYINT"/>
+            <result property="endTimestamp" column="end_timestamp" jdbcType="BIGINT"/>
+            <result property="endDatetime" column="end_datetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        grade_id,grade_name,course_id,
+        course_name,teacher_id,employee_name,
+        grade_now_student_count,grade_max_student_count,grade_now_period,
+        grade_total_period,charge_method_id,charge_method_name,charge_method_expression,
+            income,price,grade_state,end_timestamp,end_datetime
+    </sql>
+    <update id="updateTeacherInfoByGradeId">
+        update hun_base.grade
+        set teacher_id    = #{teacherId,jdbcType=NUMERIC},
+            employee_name = #{employeeName,jdbcType=VARCHAR}
+        where grade_id = #{gradeId,jdbcType=NUMERIC}
+    </update>
+    <update id="updateGradeMaxStudentCountByGradeId">
+        update hun_base.grade
+        set grade_max_student_count = #{gradeMaxStudentCount,jdbcType=NUMERIC}
+        where grade_id = #{gradeId,jdbcType=NUMERIC}
+    </update>
+
+
+    <update id="incrGradeNowStudentCountByGradeId">
+        update hun_base.grade
+        set grade_now_student_count = grade_now_student_count + #{step}
+        where grade_id = #{gradeId}
+    </update>
+    <update id="income">
+        update hun_base.grade
+        set income = income + #{income,jdbcType=DECIMAL}
+        where grade_id = #{gradeId,jdbcType=NUMERIC}
+    </update>
+    <select id="getNowStudentCount" resultType="Integer">
+        select grade_now_student_count
+        from `hun_base`.`grade`
+        where grade_id = #{gradeId, jdbcType=BIGINT}
+    </select>
+    <select id="getCategoryByCourseId" resultType="com.hun.bean.app.CategoryItemVO">
+        SELECT grade_id, grade_name
+        FROM `hun_base`.`grade`
+        WHERE course_id = #{courseId,jdbcType=BIGINT}
+    </select>
+    <select id="getCategoryGrade" resultType="com.hun.bean.app.AppGradeVO">
+        SELECT  grade_id,grade_name,
+                course_id,course_name,
+                teacher_id,employee_name,
+                price,
+                charge_method_id as chargeType,
+                charge_method_expression as chargeExpression,
+                grade_now_student_count as nowNumber,
+                grade_max_student_count as maxNumber
+        FROM `hun_base`.`grade`
+        WHERE grade_id = #{gradeId,jdbcType=BIGINT}
+    </select>
+
+</mapper>

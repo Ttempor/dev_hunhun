@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.base.StudentMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.base.Student">
+            <id property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="studentSex" column="student_sex" jdbcType="VARCHAR"/>
+            <result property="studentPhone" column="student_phone" jdbcType="CHAR"/>
+            <result property="balance" column="balance" jdbcType="DECIMAL"/>
+            <result property="lockBalance" column="lock_balance" jdbcType="DECIMAL"/>
+            <result property="spend" column="spend" jdbcType="DECIMAL"/>
+            <result property="gradeCount" column="grade_count" jdbcType="INTEGER"/>
+            <result property="openId" column="open_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        student_id,student_name,student_sex,
+        student_phone,balance,lock_balance,spend,
+        grade_count
+    </sql>
+
+    <update id="batchSubtractBalanceAndLockBalance">
+       <foreach collection="attendStudentIds" item="studentId" separator=";">
+           UPDATE `hun_base`.`student_dev`
+           <set>
+               `balance` = balance - #{schedulePrice},
+               `lock_balance` = lock_balance - #{schedulePrice}
+           </set>
+            WHERE `student_id` = #{studentId}
+       </foreach>
+    </update>
+</mapper>

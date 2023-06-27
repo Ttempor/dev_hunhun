@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.expand.GradeInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.expand.GradeInfo">
+            <result property="gradeInfoId" column="grade_info_id" jdbcType="BIGINT"/>
+            <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="gradeId" column="grade_id" jdbcType="BIGINT"/>
+            <result property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+            <result property="teacherId" column="teacher_id" jdbcType="BIGINT"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="BIGINT"/>
+            <result property="chargeMethodName" column="charge_method_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="DECIMAL"/>
+            <result property="consumePeriod" column="consume_period" jdbcType="INTEGER"/>
+            <result property="missPeriod" column="miss_period" jdbcType="INTEGER"/>
+            <result property="totalPeriod" column="total_period" jdbcType="INTEGER"/>
+            <result property="spendBalance" column="spend_balance" jdbcType="DECIMAL"/>
+            <result property="lockBalance" column="lock_balance" jdbcType="DECIMAL"/>
+            <result property="lockSpendBalance" column="lock_spend_balance" jdbcType="DECIMAL"/>
+            <result property="gradeState" column="grade_state" jdbcType="TINYINT"/>
+            <result property="endTimestamp" column="end_timestamp" jdbcType="BIGINT"/>
+            <result property="endDatetime" column="end_datetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        grade_info_id,student_id,student_name,course_id,
+        course_name,grade_id,grade_name,
+        teacher_id,employee_name,charge_method_id,
+        charge_method_name,charge_method_expression,consume_period,
+        miss_period,total_period,spend_balance,
+        lock_balance,lock_spend_balance,grade_state,end_timestamp,end_datetime
+
+    </sql>
+
+
+    <update id="updateTeacherIdAndEmployeeNameByGradeId">
+        update hun_expand.grade_info
+        set teacher_id    = #{teacherId,jdbcType=NUMERIC},
+            employee_name = #{employeeName,jdbcType=VARCHAR}
+        where grade_id = #{gradeId,jdbcType=NUMERIC}
+    </update>
+
+    <select id="selectOneByGradeIdAndStudentId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from hun_expand.grade_info
+        where
+        grade_id = #{gradeId,jdbcType=NUMERIC}
+        AND student_id = #{studentId,jdbcType=NUMERIC}
+    </select>
+
+    <select id="getGradeStudents" resultType="com.hun.bean.bo.AttendStudentBO">
+        select student_id, student_name from hun_expand.grade_info where grade_id = #{gradeId}
+    </select>
+
+    <update id="batchPlusMissPeriod">
+        <foreach collection="missStudentIds" item="item" index="index" separator=";">
+            update hun_expand.grade_info
+            <set>miss_period = miss_period + #{missPeriod}</set>
+            where grade_id = #{gradeId} and student_id = #{item}
+        </foreach>
+    </update>
+
+    <update id="batchPlusConsumePeriod">
+        <foreach collection="consumeStudentIds" item="item" index="index" separator=";">
+            update hun_expand.grade_info
+            <set>consume_period = consume_period + #{consumePeriod}</set>
+            where grade_id = #{gradeId} and student_id = #{item}
+        </foreach>
+    </update>
+
+
+
+    <select id="getInfoByScheduleId" resultType="com.hun.bean.bo.ScheduleExpandStudentListVo">
+        SELECT g.consume_period, g.miss_period, g.total_period, g.spend_balance, g.lock_balance,
+               g.lock_spend_balance, s.schedule_state, g.student_id, g.student_name,
+               s.schedule_id, s.student_schedule_id,
+                (miss_reason is not null) as isMiss,
+                (s.source_schedule_id != s.schedule_id) as isTiaoke
+        FROM `hun_expand`.`student_schedule` as s
+                 left JOIN  `hun_expand`.`grade_info` as g
+                            on s.source_grade_id = g.grade_id
+                                and s.student_id = g.student_id
+        where s.schedule_id = #{scheduleId,jdbcType=BIGINT};
+    </select>
+
+
+    <select id="getStudentGrades" resultType="com.hun.bean.app.StudentGradeVO">
+        SELECT  grade_id, grade_name
+        FROM `hun_expand`.`grade_info`
+        WHERE student_id = #{studentId,jdbcType=BIGINT}
+            and grade_state != ${@com.hun.bean.enums.GradeState@end.code}
+    </select>
+</mapper>

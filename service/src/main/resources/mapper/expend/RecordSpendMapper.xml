@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.expand.RecordSpendMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.expand.RecordSpend">
+            <result property="recordSpendId" column="record_spend_id" jdbcType="BIGINT"/>
+            <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="gradeId" column="grade_id" jdbcType="BIGINT"/>
+            <result property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+            <result property="spendTime" column="spend_time" jdbcType="TIMESTAMP"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="BIGINT"/>
+            <result property="chargeMethodName" column="charge_method_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="DECIMAL"/>
+            <result property="consume" column="consume" jdbcType="DECIMAL"/>
+            <result property="balance" column="balance" jdbcType="DECIMAL"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        record_spend_id,student_id,student_name,
+        grade_id,grade_name,course_id,
+        spend_time,course_name,charge_method_id,
+        charge_method_name,charge_method_expression,consume,
+        balance,description
+    </sql>
+</mapper>

@@ -1,0 +1,51 @@
+spring:
+  main:
+    allow-circular-references: true
+
+  application:
+    name: dev_hunhun
+
+  datasource:
+    url: jdbc:mysql://gasaiyuno.love:3306/?allowMultiQueries=true
+    username: root
+    password: e0af94f845ec7d47
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 120000
+
+  rabbitmq:
+    host: www.gasaiyuno.love
+
+  redis:
+    host: www.gasaiyuno.love
+    password: cnmb
+    port: 6777
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+default-page-size: 13
+
+
+auth:
+  token:
+    signKey: 1234567890abcdef
+  password:
+    signKey: 1234567890abcdef
+
+
+admin:
+  username: admin
+  password: admin
+
+wx-util:
+  WX_ACCESS_TOKEN_KEY: "WX_ACCESS_TOKEN"
+  APP_ID: "wx24fc72de8aafe0ef"
+  APP_SECRET: "f41caba88d80ac86e40bbfeadc343e63"
+
+
+redis-lock:
+  LOCK_GRADE_KEY: "BUY_LOCK_GRADE_ID_"
+  LOCK_STUDENT_KEY: "BUY_LOCK_STUDENT_ID_"

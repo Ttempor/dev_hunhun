@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.expand.StudentGradeStopMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.expand.StudentGradeStop">
+            <id property="stopId" column="stop_id" jdbcType="BIGINT"/>
+            <result property="gradeInfoId" column="grade_info_id" jdbcType="BIGINT"/>
+            <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="gradeId" column="grade_id" jdbcType="BIGINT"/>
+            <result property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+            <result property="teacherId" column="teacher_id" jdbcType="BIGINT"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="BIGINT"/>
+            <result property="chargeMethodName" column="charge_method_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="DECIMAL"/>
+            <result property="consumePeriod" column="consume_period" jdbcType="INTEGER"/>
+            <result property="missPeriod" column="miss_period" jdbcType="INTEGER"/>
+            <result property="totalPeriod" column="total_period" jdbcType="INTEGER"/>
+            <result property="spendBalance" column="spend_balance" jdbcType="DECIMAL"/>
+            <result property="lockBalance" column="lock_balance" jdbcType="DECIMAL"/>
+            <result property="lockSpendBalance" column="lock_spend_balance" jdbcType="DECIMAL"/>
+            <result property="gradeState" column="grade_state" jdbcType="TINYINT"/>
+            <result property="stopDatetime" column="stop_datetime" jdbcType="TIMESTAMP"/>
+            <result property="stopTimestamp" column="stop_timestamp" jdbcType="BIGINT"/>
+            <result property="stopReason" column="stop_reason" jdbcType="VARCHAR"/>
+            <result property="depositLockBalance" column="deposit_lock_balance" jdbcType="DECIMAL"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        stop_id,grade_info_id,student_id,
+        student_name,course_id,course_name,
+        grade_id,grade_name,teacher_id,
+        employee_name,charge_method_id,charge_method_name,
+        charge_method_expression,consume_period,miss_period,
+        total_period,spend_balance,lock_balance,
+        lock_spend_balance,grade_state,stop_datetime,
+        stop_timestamp,stop_reason,deposit_lock_balance
+    </sql>
+
+    <select id="getCountByGradeIdAndMonth" resultType="Integer">
+        SELECT COUNT(*)
+        FROM `hun_expand`.`student_grade_stop`
+        WHERE grade_id = #{gradeId, jdbcType=BIGINT}
+          and stop_datetime >= #{startTimestamp, jdbcType=BIGINT}
+          and #{endTimestamp, jdbcType=BIGINT} > stop_datetime
+    </select>
+
+    <select id="getByMonthAndGroupByGradeId" resultType="com.hun.bean.entity.expand.StudentGradeStop">
+    SELECT *
+    FROM `hun_expand`.`student_grade_stop`
+    WHERE stop_datetime >= #{startTimestamp, jdbcType=BIGINT}
+      and #{endTimestamp, jdbcType=BIGINT} > stop_datetime
+    group by grade_id
+</select>
+</mapper>

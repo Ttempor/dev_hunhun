@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.expand.StudentScheduleMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.expand.StudentSchedule">
+            <id property="studentScheduleId" column="student_schedule_id" jdbcType="BIGINT"/>
+            <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="scheduleId" column="schedule_id" jdbcType="BIGINT"/>
+            <result property="gradeId" column="grade_id" jdbcType="BIGINT"/>
+            <result property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+            <result property="teacherId" column="teacher_id" jdbcType="BIGINT"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="gradeRoom" column="grade_room" jdbcType="VARCHAR"/>
+            <result property="startTimestamp" column="start_timestamp" jdbcType="BIGINT"/>
+            <result property="startDatetime" column="start_datetime" jdbcType="TIMESTAMP"/>
+            <result property="endTimestamp" column="end_timestamp" jdbcType="BIGINT"/>
+            <result property="endDatetime" column="end_datetime" jdbcType="TIMESTAMP"/>
+            <result property="consumePeriod" column="consume_period" jdbcType="INTEGER"/>
+            <result property="income" column="income" jdbcType="DECIMAL"/>
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="BIGINT"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="DECIMAL"/>
+            <result property="scheduleState" column="schedule_state" jdbcType="TINYINT"/>
+            <result property="sourceScheduleId" column="source_schedule_id" jdbcType="BIGINT"/>
+            <result property="sourceGradeId" column="source_grade_id" jdbcType="BIGINT"/>
+            <result property="missReason" column="miss_reason" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        student_schedule_id,student_id,student_name,
+        schedule_id,grade_id,grade_name,
+        teacher_id,employee_name,grade_room,
+        start_timestamp,start_datetime,end_timestamp,
+        end_datetime,consume_period,income,
+        charge_method_id,charge_method_expression,schedule_state,
+        source_schedule_id,source_grade_id,miss_reason
+    </sql>
+
+    <select id="attendCount" resultType="Integer">
+        select count(*)
+        from hun_expand.student_schedule
+        where miss_reason is null
+          AND end_timestamp >= #{startTimestamp,jdbcType=BIGINT}
+          AND #{endTimestamp,jdbcType=BIGINT} > end_timestamp
+    </select>
+
+    <select id="missCount" resultType="Integer">
+        select count(*)
+        from hun_expand.student_schedule
+        where miss_reason is not null
+          AND end_timestamp >= #{startTimestamp,jdbcType=BIGINT}
+          AND #{endTimestamp,jdbcType=BIGINT} > end_timestamp
+    </select>
+
+    <select id="callCourseCancelIncome" resultType="BigDecimal">
+        SELECT SUM(income)
+        FROM `hun_expand`.`student_schedule`
+        where charge_method_id = ${@com.hun.bean.enums.ChargeMethodCategory@PERIOD.code}
+          and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+          and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+    </select>
+
+    <select id="courseCancelIncome" resultType="BigDecimal">
+        SELECT SUM(income)
+        FROM `hun_expand`.`student_schedule`
+        where end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+            and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+    </select>
+
+    <select id="studentCourseCancelPeriod" resultType="Integer">
+        SELECT SUM(consume_period)
+        FROM `hun_expand`.`student_schedule`
+        where  miss_reason is null
+          and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+          and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+    </select>
+
+
+<!--    <select id="getByTimestampByGroupTeacherId" resultType="com.hun.bean.entity.expand.StudentSchedule">-->
+<!--        select <include refid="Base_Column_List"/>-->
+<!--        from `hun_expand`.`student_schedule`-->
+<!--        where end_timestamp >= #{startTimestamp, jdbcType=BIGINT}-->
+<!--        and #{endTimestamp, jdbcType=BIGINT} > end_timestamp-->
+<!--        GROUP BY teacher_id-->
+<!--    </select>-->
+
+<!--    <select id="getByTimestampByTeacherIdByGroupGradeId" resultType="com.hun.bean.vo.FinancialAnalysisTeacherVO">-->
+<!--        select count(miss_reason is not null or null) as missCount, count(miss_reason is null or null) as attendCount,-->
+<!--               sum(income) as courseCancelIncome, grade_id, grade_name, charge_method_id-->
+<!--        from `hun_expand`.`student_schedule`-->
+<!--        where  teacher_id = #{teacherId,jdbcType=BIGINT}-->
+<!--          and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}-->
+<!--          and #{endTimestamp, jdbcType=BIGINT} > end_timestamp-->
+<!--        GROUP BY grade_id-->
+<!--    </select>-->
+
+    <select id="getStudentCountByMonth" resultType="Integer">
+        select count(*)
+        from
+            (select student_id
+             from `hun_expand`.`student_schedule`
+             WHERE miss_reason is null
+               and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+               and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+                GROUP BY student_id
+            ) as e
+    </select>
+
+    <select id="getMonthStudentCountByGradeId" resultType="Integer">
+        select count(*)
+        from
+            (select student_id
+             from `hun_expand`.`student_schedule`
+             WHERE grade_id = #{gradeId, jdbcType=BIGINT}
+                and miss_reason is null
+               and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+               and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+             GROUP BY student_id
+            ) as e
+    </select>
+
+
+
+        <select id="getAllCountAndIncomeByGradeId" resultType="com.hun.bean.bo.FinancialAnalysisTeacherBO">
+            select count(miss_reason is not null or null) as missCount, count(miss_reason is null or null) as attendCount,
+                   sum(income) as courseCancelIncome
+            from `hun_expand`.`student_schedule`
+            where  grade_id = #{gradeId, jdbcType=BIGINT}
+              and end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+              and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+        </select>
+
+        <select id="getAllCountAndIncome" resultType="com.hun.bean.bo.FinancialAnalysisHeaderBO">
+            select count(miss_reason is not null or null) as missCount,
+                   count(miss_reason is null or null) as attendCount,
+                   sum(income) as courseCancelIncome,
+                   sum(if(charge_method_id = ${@com.hun.bean.enums.ChargeMethodCategory@PERIOD.code}, income, null))
+                       as callCourseCancelIncome,
+                   sum(if(miss_reason is NULL, consume_period, null))
+                       as consume_period
+            from `hun_expand`.`student_schedule`
+            where end_timestamp >= #{startTimestamp, jdbcType=BIGINT}
+              and #{endTimestamp, jdbcType=BIGINT} > end_timestamp
+        </select>
+
+
+    <select id="studentInScheduleByScheduleIds" resultType="integer">
+        SELECT count(*)
+        FROM `hun_expand`.`student_schedule`
+        where student_id = #{studentId,jdbcType=BIGINT}
+         and schedule_id IN(<foreach collection="scheduleIds" item="id" separator="," >#{id}</foreach>)
+        Limit 1
+    </select>
+
+    <select id="getStudentSchedules" resultType="com.hun.bean.app.StudentScheduleVO">
+        SELECT consume_period as period, schedule_state as state,
+               start_datetime, end_datetime, grade_room as room, employee_name as teacher
+        FROM `hun_expand`.`student_schedule`
+        where student_id = #{studentId,jdbcType=BIGINT} and grade_id = #{gradeId,jdbcType=BIGINT}
+        order by start_timestamp
+    </select>
+</mapper>

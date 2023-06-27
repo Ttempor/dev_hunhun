@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hun.service.mapper.base.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.hun.bean.entity.base.Course">
+            <id property="courseId" column="course_id" jdbcType="INTEGER"/>
+            <result property="courseName" column="course_name" jdbcType="CHAR"/>
+            <result property="chargeMethodId" column="charge_method_id" jdbcType="INTEGER"/>
+            <result property="chargeMethodName" column="charge_method_name" jdbcType="VARCHAR"/>
+            <result property="chargeMethodExpression" column="charge_method_expression" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="INTEGER"/>
+            <result property="courseTotalPeriod" column="course_total_period" jdbcType="INTEGER"/>
+            <result property="courseNowGradeCount" column="course_now_grade_count" jdbcType="INTEGER"/>
+            <result property="courseNowTeacherCount" column="course_now_teacher_count" jdbcType="INTEGER"/>
+            <result property="courseNowStudentCount" column="course_now_student_count" jdbcType="INTEGER"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        course_id,course_name,charge_method_id,price,
+        charge_method_name,charge_method_expression,course_total_period,
+        course_now_grade_count,course_now_teacher_count,course_now_student_count,
+        is_delete
+    </sql>
+
+    <select id="getCategory" resultType="com.hun.bean.app.CategoryCourseBO">
+        SELECT course_id, course_name
+        FROM `hun_base`.`course_dev`
+        WHERE course_now_grade_count > 0
+    </select>
+</mapper>
